@@ -2,7 +2,7 @@
 
 Based on the tutorial offered by freecodecamp.
 
-##Instructions
+## Instructions
 
 1. Users can enter the lottery using ETH based on a USD fee ($50).
 2. Admin will choose when the lottery ends.
