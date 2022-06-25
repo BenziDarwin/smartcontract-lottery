@@ -2,7 +2,7 @@ dotenv: .env
 dependencies:
   - smartcontractkit/chainlink-brownie-contracts@0.4.0
 
-complier:
+compiler:
   solc:
     remappings:
       - "@chainlink=smartcontractkit/chainlink-brownie-contracts@0.4.0"
@@ -11,3 +11,10 @@ networks:
   default: development
   rinkeby:
     eth_usd_price_feed: "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e"
+    verify: false
+  mainnet-fork-dev:
+    eth_usd_price_feed: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+    verify: false
+
+wallets:
+  from_key: ${RINKEBY_PRIVATE_KEY}
