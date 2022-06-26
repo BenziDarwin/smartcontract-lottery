@@ -6,7 +6,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract Lottery {
     address payable[] public participants;
-    mapping(uint256 => address) public participantWithPosition;
+    mapping(uint256 => address) public view participantWithPosition;
     uint256 noOfParticipants = 0;
     AggregatorV3Interface priceFeed;
     address Admin;
