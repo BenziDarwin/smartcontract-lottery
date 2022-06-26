@@ -10,8 +10,6 @@ STARTING_PRICE = 214234223
 def choose_account():
     if network.show_active() in LOCAL_ENVS or network.show_active() in FORKED_ENVS:
         return accounts[0]
-    else:
-        pass
 
 
 def deploy_mocks(_account):
@@ -19,20 +17,20 @@ def deploy_mocks(_account):
         MockV3Aggregator.deploy(DECIMALS, STARTING_PRICE, {"from": _account})
 
 
-def deploy_contract():
-    if network.show_active() in LOCAL_ENVS:
-        account = choose_account()
-        lottery = Lottery.deploy(MockV3Aggregator[0].address, {"from": account})
-        return lottery
+# def deploy_contract():
+#     if network.show_active() in LOCAL_ENVS:
+#         account = choose_account()
+#         lottery = Lottery.deploy(MockV3Aggregator[0].address, {"from": account})
+#         return lottery
 
-    elif network.show_active() in FORKED_ENVS:
-        account = choose_account()
-        if len(Lottery) <= 0:
-            lottery = Lottery.deploy(
-                config["networks"][network.show_active()]["eth_usd_price_feed"],
-                {"from": account},
-            )
-            return lottery
-        else:
-            lottery = Lottery[0]
-            return lottery
+#     elif network.show_active() in FORKED_ENVS:
+#         account = choose_account()
+#         if len(Lottery) <= 0:
+#             lottery = Lottery.deploy(
+#                 config["networks"][network.show_active()]["eth_usd_price_feed"],
+#                 {"from": account},
+#             )
+#             return lottery
+#         else:
+#             lottery = Lottery[0]
+#             return lottery

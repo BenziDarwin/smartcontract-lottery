@@ -11,27 +11,64 @@ contract Lottery {
     AggregatorV3Interface priceFeed;
     address Admin;
     uint256 entryFeeInCash;
-    uint256 priceEth;
+    uint256 entryFeeInEth;
+    enum LOTTERY_STATE {
+        OPEN,
+        CLOSED,
+        CALCULATING_WINNER
+    }
+    LOTTERY_STATE public lottery_state;
 
     constructor(address _priceFeed) public {
         entryFeeInCash = 50 * 10**15;
         Admin = msg.sender;
+        lottery_state = LOTTERY_STATE.CLOSED;
         priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
-    function addParticipant() public payable {
-        require(msg.value < getEntranceFee(), "Not enough eth!");
+    modifier participantCheck() {
+        require(
+            lottery_state == LOTTERY_STATE.OPEN,
+            "The lottery hasn't started yet!"
+        );
+        require(msg.value >= setEntranceFee(), "Not enough eth!");
+        _;
+    }
+
+    function addParticipant() public payable participantCheck {
         participants.push(payable(msg.sender));
         participantWithPosition[noOfParticipants++] = msg.sender;
     }
 
-    function getEntranceFee() public returns (uint256) {
+    //This function sets the entrance fee, needed before being able to show the fee.
+    function setEntranceFee() public returns (uint256) {
         (, int256 price, , , ) = priceFeed.latestRoundData();
         uint256 usedPrice = uint256(price * 10**10);
-        return ((entryFeeInCash * 10**17) / usedPrice);
+        entryFeeInEth = ((entryFeeInCash * 10**18) / usedPrice);
+        return entryFeeInEth;
     }
 
-    function startLottery() public {}
+    function showEntranceFee() public view returns (uint256) {
+        return entryFeeInEth;
+    }
 
-    function endLottery() public {}
+    modifier onlyAdmin() {
+        require(
+            msg.sender == Admin,
+            "Only the admin can start/stop the lottery!"
+        );
+        _;
+    }
+
+    function startLottery() public onlyAdmin {
+        require(
+            lottery_state == LOTTERY_STATE.CLOSED,
+            "A lottery is still on going!"
+        );
+        lottery_state = LOTTERY_STATE.OPEN;
+    }
+
+    function endLottery() public onlyAdmin {
+        lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
+    }
 }
