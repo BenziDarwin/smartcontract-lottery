@@ -1,6 +1,11 @@
-import pytest
 from scripts.deploy import deploy
 from scripts.helpful_scripts import choose_account
+
+
+def test_deploy():
+    account = choose_account()
+    lottery = deploy()
+    assert lottery.showAdminAccount() == account
 
 
 def test_get_entrance_fee():

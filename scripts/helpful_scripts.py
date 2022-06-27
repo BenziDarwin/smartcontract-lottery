@@ -10,6 +10,8 @@ STARTING_PRICE = 214234223
 def choose_account():
     if network.show_active() in LOCAL_ENVS or network.show_active() in FORKED_ENVS:
         return accounts[0]
+    else:
+        return accounts.add(config["wallets"]["from_key"])
 
 
 def deploy_mocks(_account):
