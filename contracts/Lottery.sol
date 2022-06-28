@@ -27,6 +27,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
     uint16 requestConfirmations = 3;
     uint32 callbackGasLimit = 100000;
     uint32 numWords = 2;
+    address payable public recentWinner;
 
     //address VRFCoordinator = 0x6168499c0cFfCaCD319c818142124B7A15E857ab;
     enum LOTTERY_STATE {
@@ -86,7 +87,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
     }
 
     // For VRFCoordinator
-    function requestRandomWords() public {
+    function requestRandomWords() private onlyAdmin {
         // Will revert if subscription is not set and funded.
         requestId = coordinator.requestRandomWords(
             keyHash,
@@ -97,11 +98,22 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
         );
     }
 
-    function fulfillRandomWords(
-        uint256, /* requestId */
-        uint256[] memory randomWords
-    ) internal override {
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
+        internal
+        override
+    {
+        require(
+            lottery_state == LOTTERY_STATE.CALCULATING_WINNER,
+            "Lottery hasn't been concluded yet!"
+        );
+        require(s_randomWords[0] > 0, "Random word not found :(");
         s_randomWords = randomWords;
+        uint256 indexOfWinner = randomWords[0] % participants.length;
+        recentWinner = participants[indexOfWinner];
+        recentWinner.transfer(address(this).balance);
+        //Reseting the list
+        participants = new address payable[](0);
+        lottery_state = LOTTERY_STATE.CLOSED;
     }
 
     function showEntranceFee() public view returns (uint256) {
@@ -126,5 +138,6 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
 
     function endLottery() public onlyAdmin {
         lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
+        requestRandomWords();
     }
 }
