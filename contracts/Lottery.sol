@@ -53,6 +53,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
         lottery_state = LOTTERY_STATE.CLOSED;
         priceFeed = AggregatorV3Interface(_priceFeed);
         createNewSubscription();
+        setEntranceFee();
     }
 
     modifier participantCheck() {
@@ -74,7 +75,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
     }
 
     //This function sets the entrance fee, needed before being able to show the fee.
-    function setEntranceFee() public returns (uint256) {
+    function setEntranceFee() internal returns (uint256) {
         (, int256 price, , , ) = priceFeed.latestRoundData();
         uint256 usedPrice = uint256(price * 10**10);
         entryFeeInEth = ((entryFeeInCash * 10**18) / usedPrice);

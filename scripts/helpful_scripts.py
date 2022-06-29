@@ -7,6 +7,7 @@ from brownie import (
     LinkToken,
     Lottery,
     Contract,
+    interface,
 )
 
 
@@ -111,3 +112,15 @@ def get_contract(contract_name):
             contract_type._name, contract_address, contract_type.abi
         )
     return contract
+
+
+def fund_with_link(
+    contract_address, account=None, link_token=None, amount=100000000000000000
+):
+    account = account if account else choose_account()
+    link_token = link_token if link_token else get_contract("linkTokenAddress")
+    link_token_contract = interface.LinkTokenInterface(link_token.address)
+    txn = link_token_contract.transfer(contract_address, amount, {"from": account})
+    txn.wait(1)
+    print("Funded contract with Link!")
+    return txn
