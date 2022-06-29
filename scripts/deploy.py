@@ -3,7 +3,7 @@ from scripts.helpful_scripts import choose_account, deploy_contract, fund_with_l
 
 def deploy():
     print("Deploying contract...")
-    lottery = deploy_contract()
+    deploy_contract()
     print("Contract successfully deployed!")
 
 

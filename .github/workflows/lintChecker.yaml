@@ -12,6 +12,10 @@ jobs:
       - name: Run Super-Linter
         uses: github/super-linter@v4.9.4
 
+        with:
+          eslint: true
+          prettier: true
+
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
