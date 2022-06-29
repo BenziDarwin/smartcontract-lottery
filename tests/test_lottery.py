@@ -1,4 +1,3 @@
-from scripts.deploy import deploy
 from scripts.helpful_scripts import choose_account, deploy_contract
 
 
@@ -17,8 +16,7 @@ def test_request_random_words():
 
 
 def test_get_entrance_fee():
-    account = choose_account()
-    lottery = deploy()
+    lottery = deploy_contract()
     lottery.setEntranceFee()
     entranceFee = lottery.showEntranceFee()
     assert entranceFee != 0

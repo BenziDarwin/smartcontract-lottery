@@ -1,13 +1,13 @@
 from brownie import (
-    accounts,
-    config,
-    network,
-    MockV3Aggregator,
-    VRFCoordinatorV2Mock,
+    Contract,
     LinkToken,
     Lottery,
-    Contract,
+    MockV3Aggregator,
+    VRFCoordinatorV2Mock,
+    accounts,
+    config,
     interface,
+    network,
 )
 
 
@@ -22,6 +22,7 @@ contract_to_mock = {
     "vrfcoordinator_address": VRFCoordinatorV2Mock,
     "linkTokenAddress": LinkToken,
 }
+
 
 # This function is used to pick an account depending on your network.
 def choose_account():
@@ -55,7 +56,7 @@ def deploy_mocks(
 
 
 def deploy_lottery(_account):
-    lottery = Lottery.deploy(
+    return Lottery.deploy(
         get_contract("eth_usd_price_feed").address,
         get_contract("vrfcoordinator_address").address,
         config["networks"][network.show_active()]["key_hash"],
@@ -68,19 +69,19 @@ def deploy_lottery(_account):
 def deploy_contract():
     account = choose_account()
     if network.show_active() in LOCAL_ENVS:
-        deploy_lottery(account)
+        lottery = deploy_lottery(account)
         return lottery
 
     elif network.show_active() in FORKED_ENVS:
         if len(Lottery) <= 0:
-            deploy_lottery(account)
+            lottery = deploy_lottery(account)
             return lottery
         else:
             lottery = Lottery[0]
             return lottery
     else:
         if len(Lottery) <= 0:
-            deploy_lottery(account)
+            lottery = deploy_lottery(account)
             return lottery
         else:
             lottery = Lottery[0]

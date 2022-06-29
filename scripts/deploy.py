@@ -1,5 +1,4 @@
-from brownie import Lottery, network, MockV3Aggregator, config
-from scripts.helpful_scripts import deploy_contract, choose_account, fund_with_link
+from scripts.helpful_scripts import choose_account, deploy_contract, fund_with_link
 
 
 def deploy():
