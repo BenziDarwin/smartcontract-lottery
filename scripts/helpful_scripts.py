@@ -54,41 +54,33 @@ def deploy_mocks(
         VRFCoordinatorV2Mock.deploy(base_fee, gas_price_link, {"from": account})
 
 
+def deploy_lottery(_account):
+    lottery = Lottery.deploy(
+        get_contract("eth_usd_price_feed").address,
+        get_contract("vrfcoordinator_address").address,
+        config["networks"][network.show_active()]["key_hash"],
+        get_contract("linkTokenAddress").address,
+        {"from": _account},
+    )
+
+
 # This function is used to deploy the contract.
 def deploy_contract():
     account = choose_account()
     if network.show_active() in LOCAL_ENVS:
-        lottery = Lottery.deploy(
-            get_contract("eth_usd_price_feed").address,
-            get_contract("vrfcoordinator_address").address,
-            config["networks"][network.show_active()]["key_hash"],
-            get_contract("linkTokenAddress").address,
-            {"from": account},
-        )
+        deploy_lottery(account)
         return lottery
 
     elif network.show_active() in FORKED_ENVS:
         if len(Lottery) <= 0:
-            lottery = Lottery.deploy(
-                get_contract("eth_usd_price_feed").address,
-                get_contract("vrfcoordinator_address").address,
-                config["networks"][network.show_active()]["key_hash"],
-                get_contract("linkTokenAddress").address,
-                {"from": account},
-            )
+            deploy_lottery(account)
             return lottery
         else:
             lottery = Lottery[0]
             return lottery
     else:
         if len(Lottery) <= 0:
-            lottery = Lottery.deploy(
-                get_contract("eth_usd_price_feed").address,
-                get_contract("vrfcoordinator_address").address,
-                config["networks"][network.show_active()]["key_hash"],
-                get_contract("linkTokenAddress").address,
-                {"from": account},
-            )
+            deploy_lottery(account)
             return lottery
         else:
             lottery = Lottery[0]
