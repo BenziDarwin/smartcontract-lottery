@@ -1,9 +1,9 @@
 from brownie import (
     Contract,
-    LinkToken,
     Lottery,
     MockV3Aggregator,
-    VRFCoordinatorV2Mock,
+    LinkToken,
+    VRFCoordinatorMock,
     accounts,
     config,
     interface,
@@ -19,7 +19,7 @@ GAS_PRICE_LINK = 1
 BASE_FEE = 1
 contract_to_mock = {
     "eth_usd_price_feed": MockV3Aggregator,
-    "vrfcoordinator_address": VRFCoordinatorV2Mock,
+    "vrfcoordinator_address": VRFCoordinatorMock,
     "linkTokenAddress": LinkToken,
 }
 
@@ -40,8 +40,6 @@ def deploy_mocks(
     contract_type,
     decimals=DECIMALS,
     starting_price=STARTING_PRICE,
-    base_fee=BASE_FEE,
-    gas_price_link=GAS_PRICE_LINK,
 ):
     account = choose_account()
 
@@ -51,8 +49,11 @@ def deploy_mocks(
     if contract_type == LinkToken:
         LinkToken.deploy({"from": account})
 
-    if contract_type == VRFCoordinatorV2Mock:
-        VRFCoordinatorV2Mock.deploy(base_fee, gas_price_link, {"from": account})
+    if contract_type == VRFCoordinatorMock:
+        VRFCoordinatorMock.deploy(
+            config["networks"][network.show_active()]["linkTokenAddress"],
+            {"from": account},
+        )
 
 
 def deploy_lottery(_account):
@@ -61,7 +62,9 @@ def deploy_lottery(_account):
         get_contract("vrfcoordinator_address").address,
         config["networks"][network.show_active()]["key_hash"],
         get_contract("linkTokenAddress").address,
+        config["networks"][network.show_active()]["fee"],
         {"from": _account},
+        publish_source=config["networks"][network.show_active()]["verify"],
     )
 
 
@@ -108,7 +111,7 @@ def get_contract(contract_name):
 
 
 def fund_with_link(
-    contract_address, account=None, link_token=None, amount=100000000000000000
+    contract_address, account=None, link_token=None, amount=2000000000000000000
 ):
     account = account if account else choose_account()
     link_token = link_token if link_token else get_contract("linkTokenAddress")
@@ -116,4 +119,3 @@ def fund_with_link(
     txn = link_token_contract.transfer(contract_address, amount, {"from": account})
     txn.wait(1)
     print("Funded contract with Link!")
-    return txn

@@ -1,4 +1,5 @@
 from scripts.helpful_scripts import choose_account, deploy_contract, fund_with_link
+import time
 
 
 def deploy():
@@ -21,17 +22,27 @@ def enter_lottery():
     value = lottery.showEntranceFee()
     txn = lottery.addParticipant({"from": account, "value": value})
     txn.wait(1)
-    print("Participant successfully added!")
+    print(f"Participant {lottery.showRecentEntry()} successfully added!")
 
 
 def end_lottery():
     account = choose_account()
     lottery = deploy_contract()
-    txn = fund_with_link(lottery.address)
-    txn.wait(1)
+    fund_with_link(lottery.address)
     txn = lottery.endLottery({"from": account})
+    print("Ending lottery")
     txn.wait(1)
-    print("Lottery successfully ended!")
+    check_recent_winner()
+    print(f"{lottery.recentWinner()} is the winner of this lottery!")
+
+
+def check_recent_winner():
+    lottery = deploy_contract()
+    while lottery.recentWinner() == "0x0000000000000000000000000000000000000000":
+        print("Calculating winner...")
+        time.sleep(10)
+
+    print(f"We have a winner! {lottery.recentWinner()}")
 
 
 def main():

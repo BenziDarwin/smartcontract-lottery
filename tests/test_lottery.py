@@ -20,3 +20,8 @@ def test_get_entrance_fee():
     lottery.setEntranceFee()
     entranceFee = lottery.showEntranceFee()
     assert entranceFee != 0
+
+
+def test_show_recent_winner():
+    lottery = deploy_contract()
+    assert lottery.recentWinner() != "0x0000000000000000000000000000000000000000"
